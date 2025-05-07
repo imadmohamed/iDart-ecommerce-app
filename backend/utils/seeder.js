@@ -1,0 +1,1 @@
+const products = required('../data/product.json');
