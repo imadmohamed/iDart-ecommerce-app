@@ -61,7 +61,6 @@ exports.updateProduct = async(req, res, next) =>{
 }
 
 //Delete Product -  /api/v1/product/:id
-
 exports.deleteProduct = async (req, res, next) => {
  
       const product = await Product.findByIdAndDelete(req.params.id);
