@@ -19,7 +19,7 @@ exports.getProducts = async (req, res, next) =>{
     })
 }
 
-//Get Single Product
+//Get Single Product - /api/v1/product/:id
 exports.getSingleProduct = async (req, res, next) => {
    const product =  await Product.findById(req.params.id);
 
@@ -37,8 +37,10 @@ exports.getSingleProduct = async (req, res, next) => {
 
 }
 
-//Update Product
+//Update Product - /api/v1/product/:id
 exports.updateProduct = async(req, res, next) =>{
+
+    let product = await Product.findById(req.params.id);
 
     if(!product){
         return res.status(404).json({
