@@ -1,81 +1,188 @@
-const Product = require('../models/productModuls')
-const ErrorHandler = require('../utils/errorHandler')
+// const Product = require('../models/productModuls')
+// const ErrorHandler = require('../utils/errorHandler')
 
-//Get Products - /api/v1/products
-exports.getProducts = async (req, res, next) =>{
+// //Get Products - /api/v1/products
+// exports.getProducts = async (req, res, next) =>{
+//     const products = await Product.find();
+//     res.status(200).json({
+//         success : true,
+//         count: products.length,
+//         products
+//     })
+// }
+
+// //Create Products - /api/v1/product/new
+//  exports.newProduct = async (req, res, next) =>{
+//     const product = await Product.create(req.body)
+//     res.status(201).json({
+//         success: true,
+//         product
+//     })
+// }
+
+// //Get Single Product - /api/v1/product/:id
+// exports.getSingleProduct = async (req, res, next) => {
+//    const product =  await Product.findById(req.params.id);
+
+//    if(!product){
+       
+//     return next(new ErrorHandler("Product is not found", 400))
+
+//    }
+
+//    res.status(201).json({
+//         success: true,
+//         product
+//    })
+
+// }
+
+// //Update Product - /api/v1/product/:id
+// exports.updateProduct = async(req, res, next) =>{
+
+//     let product = await Product.findById(req.params.id);
+
+//     if(!product){
+//         return res.status(404).json({
+//             success: false,
+//             message: "Product is not found"
+//         })
+//     }
+
+//     product =  await Product.findByIdAndUpdate(req.params.id, req.body, {
+//          new: true,
+//          runValidators: true
+//     })
+
+//     res.status(200).json({
+//         success:true,
+//         product
+//     })
+// }
+
+// //Delete Product -  /api/v1/product/:id
+// exports.deleteProduct = async (req, res, next) => {
+ 
+//       const product = await Product.findByIdAndDelete(req.params.id);
+  
+//       if (!product) {
+//         return res.status(404).json({
+//           success: false,
+//           message: "Product is not found"
+//         });
+//       }
+  
+//       res.status(200).json({
+//         success: true,
+//         message: "Product deleted!"
+//       });
+    
+//   };
+  
+const mongoose = require('mongoose');
+const Product = require('../models/productModuls');
+const ErrorHandler = require('../utils/errorHandler');
+
+// Get All Products - GET /api/v1/products
+exports.getProducts = async (req, res, next) => {
+  try {
     const products = await Product.find();
     res.status(200).json({
-        success : true,
-        count: products.length,
-        products
-    })
-}
+      success: true,
+      count: products.length,
+      products,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
-//Create Products - /api/v1/product/new
- exports.newProduct = async (req, res, next) =>{
-    const product = await Product.create(req.body)
+// Create New Product - POST /api/v1/product/new
+exports.newProduct = async (req, res, next) => {
+  try {
+    const product = await Product.create(req.body);
     res.status(201).json({
-        success: true,
-        product
-    })
-}
+      success: true,
+      product,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
-//Get Single Product - /api/v1/product/:id
+// Get Single Product - GET /api/v1/product/:id
 exports.getSingleProduct = async (req, res, next) => {
-   const product =  await Product.findById(req.params.id);
+  try {
+    const { id } = req.params;
 
-   if(!product){
-       
-    return next(new ErrorHandler("Product is not found", 400))
-
-   }
-
-   res.status(201).json({
-        success: true,
-        product
-   })
-
-}
-
-//Update Product - /api/v1/product/:id
-exports.updateProduct = async(req, res, next) =>{
-
-    let product = await Product.findById(req.params.id);
-
-    if(!product){
-        return res.status(404).json({
-            success: false,
-            message: "Product is not found"
-        })
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return next(new ErrorHandler('Invalid Product ID', 400));
     }
 
-    product =  await Product.findByIdAndUpdate(req.params.id, req.body, {
-         new: true,
-         runValidators: true
-    })
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return next(new ErrorHandler('Product not found', 404));
+    }
 
     res.status(200).json({
-        success:true,
-        product
-    })
-}
+      success: true,
+      product,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
-//Delete Product -  /api/v1/product/:id
+// Update Product - PUT /api/v1/product/:id
+exports.updateProduct = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return next(new ErrorHandler('Invalid Product ID', 400));
+    }
+
+    let product = await Product.findById(id);
+
+    if (!product) {
+      return next(new ErrorHandler('Product not found', 404));
+    }
+
+    product = await Product.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.status(200).json({
+      success: true,
+      product,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Delete Product - DELETE /api/v1/product/:id
 exports.deleteProduct = async (req, res, next) => {
- 
-      const product = await Product.findByIdAndDelete(req.params.id);
-  
-      if (!product) {
-        return res.status(404).json({
-          success: false,
-          message: "Product is not found"
-        });
-      }
-  
-      res.status(200).json({
-        success: true,
-        message: "Product deleted!"
-      });
-    
-  };
-  
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return next(new ErrorHandler('Invalid Product ID', 400));
+    }
+
+    const product = await Product.findByIdAndDelete(id);
+
+    if (!product) {
+      return next(new ErrorHandler('Product not found', 404));
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Product deleted successfully!',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
