@@ -2,6 +2,8 @@
 const mongoose = require('mongoose');
 const Product = require('../models/productModuls');
 const ErrorHandler = require('../utils/errorHandler');
+const catchAsyncError = require('../middleware/catchAsyncError');
+
 
 // Get All Products - GET /api/v1/products
 exports.getProducts = async (req, res, next) => {
@@ -18,17 +20,13 @@ exports.getProducts = async (req, res, next) => {
 };
 
 // Create New Product - POST /api/v1/product/new
-exports.newProduct = async (req, res, next) => {
-  try {
-    const product = await Product.create(req.body);
-    res.status(201).json({
-      success: true,
-      product,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
+exports.newProduct = catchAsyncError (async (req, res, next) => {
+  const product = await Product.create(req.body);
+  res.status(201).json({
+    success: true,
+    product
+  });
+})
 
 // Get Single Product - GET /api/v1/product/:id
 exports.getSingleProduct = async (req, res, next) => {
