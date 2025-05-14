@@ -15,39 +15,34 @@ module.exports = (err,req,res,next) => {
 }
 
 
-        //   if(process.env.NODE_ENV == 'production'){
-        //             let message = err.message;
-        //             let error = {...err};
 
-        //             if(err.name == "ValidationError"){
-        //                       message = Object.values(err.errors).map(value => value.message);
-        //                       error = new ErrorHandler(message, 400);
-        //             }
-        //             return res.status(err.statusCode).json({
-        //                       success: false,
-        //                       message: error.message || "Internal Server Error",
-        //             });  
-        //   }
+    if (process.env.NODE_ENV === 'production') {
+        let message = err.message;
+        let error = new ErrorHandler(message);
+        
+    // Validation Error
+        if (err.name === "ValidationError") {
+        message = Object.values(err.errors).map(value => value.message).join(", ");
+        error = new ErrorHandler(message, 400);
+        }
 
-          if (process.env.NODE_ENV === 'production') {
-                     let message = err.message;
-                     let error = { ...err };
+    // Cast Error (e.g., invalid MongoDB ObjectId)
+        else if (err.name === "CastError") {
+        message = `Resource not found: Invalid ${err.path}`;
+        error = new ErrorHandler(message, 404);
+        }
 
-                     if (err.name === "ValidationError") {
-                     message = Object.values(err.errors).map(value => value.message).join(", ");
-                     error = new Error(message);
-                     }         
+        return res.status(error.statusCode || 500).json({
+        success: false,
+        message: error.message || "Internal Server Error",
+        });
+    }
 
-                     return res.status(error.statusCode || 500).json({
-                     success: false,
-                     message: error.message || "Internal Server Error",
-             });
-}
 
 
                  
 
           
-}
+    }
 
 
