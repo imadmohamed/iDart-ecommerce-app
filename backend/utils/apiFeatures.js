@@ -19,7 +19,7 @@ class APIFeatures {
   }
 
   filter(){
-
+          const quryStrCopy = {...this.queryString};
   }
 
 }
