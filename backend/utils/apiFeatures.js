@@ -14,9 +14,14 @@ class APIFeatures {
         }
       : {};
 
-    this.query = this.query.find({ ...keyword }); /
+    this.query = this.query.find({ ...keyword }); 
     return this;
   }
+
+  filter(){
+
+  }
+
 }
 
 module.exports = APIFeatures;
