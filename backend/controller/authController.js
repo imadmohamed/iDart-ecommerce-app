@@ -1,51 +1,89 @@
+// const catchAsyncError = require("../middleware/catchAsyncError");
+// const User = require("../models/userModel")
+// const ErrorHandler = require("../utils/errorHandler")
+// const sendToken = require("../utils/jwt")
+
+// exports.registerUser = catchAsyncError(async (req, res, next)=>{
+//         const {name, email, password, avatar} = req.body
+//        const user = await User.create({
+//                 name,
+//                 email,
+//                 password,
+//                 avatar
+//         });
+
+
+//         sendToken(user, 201, res);
+
+// })
+
+// exports.loginUser = catchAsyncError(async(req, res, next)=> {
+//         const { email, password } = req.body 
+
+//         if(!email || !password){
+//                 return next(new ErrorHandler("Please enter email and password", 400))
+//         }
+
+//         // finding the user in the database
+
+//         const user = await User.findOne({email}).select("+passowrd");
+
+//         if(!user){
+//                 return next(new ErrorHandler("Invalid email or password", 400))
+//         }
+        
+//         if(!user.$isValidPassword(password)){
+//                 return next(new ErrorHandler("Invalid email or password", 400))
+
+//         }
+
+//         sendToken(user, 201, res);
+
+// })
+
 const catchAsyncError = require("../middleware/catchAsyncError");
-const User = require("../models/userModel")
-const ErrorHandler = require("../utils/errorHandler")
-const sendToken = require("../utils/jwt")
+const User = require("../models/userModel");
+const ErrorHandler = require("../utils/errorHandler");
+const sendToken = require("../utils/jwt");
 
-exports.registerUser = catchAsyncError(async (req, res, next)=>{
-        const {name, email, password, avatar} = req.body
-       const user = await User.create({
-                name,
-                email,
-                password,
-                avatar
-        });
+// Register a new user
+exports.registerUser = catchAsyncError(async (req, res, next) => {
+    const { name, email, password, avatar } = req.body;
 
-        // const token = user.getJWTToken();
+    const user = await User.create({
+        name,
+        email,
+        password,
+        avatar
+    });
 
-        // res.status(201).json({
-        //         success: true,
-        //         user,
-        //         token
-        // })
+    // Send JWT token
+    sendToken(user, 201, res);
+});
 
-        //replace the code 
-        
-        sendToken(user, 201, res);
+// Login user
+exports.loginUser = catchAsyncError(async (req, res, next) => {
+    const { email, password } = req.body;
 
-})
+    // Check if email and password is entered by user
+    if (!email || !password) {
+        return next(new ErrorHandler("Please enter email and password", 400));
+    }
 
-exports.loginUser = catchAsyncError(async(req, res, next)=> {
-        const [email, password] = req.body 
+    // Finding user in database
+    const user = await User.findOne({ email }).select("+password");
 
-        if(!email || !password){
-                return next(new ErrorHandler("Please enter email and password", 400))
-        }
+    if (!user) {
+        return next(new ErrorHandler("Invalid email or password", 401));
+    }
 
-        // finding the user in the database
+    // Check if password is correct
+    const isPasswordMatched = await user.comparePassword(password);
 
-        const user = await User.findOne({email}).select("+passowrd");
+    if (!isPasswordMatched) {
+        return next(new ErrorHandler("Invalid email or password", 401));
+    }
 
-        if(!user){
-                return next(new ErrorHandler("Invalid email or password", 400))
-        }
-        
-        if(!user.$isValidPassword(password)){
-                return next(new ErrorHandler("Invalid email or password", 400))
-
-        }
-
-        sendToken(user, 201, res);
-
-})
+    // Send token
+    sendToken(user, 200, res);
+});
