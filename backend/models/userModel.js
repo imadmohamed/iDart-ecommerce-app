@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
           resetPasswordToken: String,
 
           resetPasswordTokenExpairy: Date,
-          
+
           createdAt:{
                     type: Date,
                     default: Date.now
@@ -37,3 +37,6 @@ const userSchema = new mongoose.Schema({
 
 
 })
+
+let model = mongoose.model('User', userSchema)
+module.exports= model;
