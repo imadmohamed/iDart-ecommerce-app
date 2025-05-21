@@ -3,19 +3,19 @@
   "version": "1.0.0",
   "description": "e-commerce project using MERN stack",
   "main": "server.js",
-"scripts": {
+  "scripts": {
     "start": "nodemon backend/server.js",
     "dev": "set NODE_ENV=development&&nodemon backend/server.js",
     "prod": "set NODE_ENV=production&&nodemon backend/server.js",
     "seeder": "node backend/utils/seeder.js"
   },
-  
   "author": "imad",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "mongoose": "^8.13.2"
+    "mongoose": "^8.13.2",
+    "validator": "^13.15.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
